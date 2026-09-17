@@ -1,4 +1,4 @@
-# openclaude
+# opencode-mcp
 
 An MCP server that lets Claude Code delegate work to any model opencode can reach.
 
@@ -14,8 +14,8 @@ The bridge talks to opencode's headless HTTP server, so your opencode login, ski
 ## Install
 
 ```sh
-git clone <this repo> ~/Projects/PERSONAL/openclaude
-cd ~/Projects/PERSONAL/openclaude
+git clone <this repo> ~/Projects/PERSONAL/opencode-mcp
+cd ~/Projects/PERSONAL/opencode-mcp
 npm install
 npm run build
 ```
@@ -23,9 +23,9 @@ npm run build
 Register it with Claude Code once, for every project:
 
 ```sh
-claude mcp add --scope user openclaude \
-  --env OPENCLAUDE_MODEL=opencode-go/deepseek-v4.1-flash \
-  -- node /home/loba/Projects/PERSONAL/openclaude/dist/index.js
+claude mcp add --scope user opencode \
+  --env OPENCODE_MCP_MODEL=opencode-go/deepseek-v4.1-flash \
+  -- node /home/loba/Projects/PERSONAL/opencode-mcp/dist/index.js
 ```
 
 Or per project, in `.mcp.json`:
@@ -33,16 +33,16 @@ Or per project, in `.mcp.json`:
 ```json
 {
   "mcpServers": {
-    "openclaude": {
+    "opencode": {
       "command": "node",
-      "args": ["/home/loba/Projects/PERSONAL/openclaude/dist/index.js"],
-      "env": { "OPENCLAUDE_MODEL": "opencode-go/deepseek-v4.1-flash" }
+      "args": ["/home/loba/Projects/PERSONAL/opencode-mcp/dist/index.js"],
+      "env": { "OPENCODE_MCP_MODEL": "opencode-go/deepseek-v4.1-flash" }
     }
   }
 }
 ```
 
-Restart Claude Code and check `/mcp` shows `openclaude` connected.
+Restart Claude Code and check `/mcp` shows `opencode` connected.
 
 ## Use
 
@@ -81,14 +81,14 @@ All optional, set through the MCP server's `env`.
 
 | Variable | Default | Meaning |
 | --- | --- | --- |
-| `OPENCLAUDE_MODEL` | opencode's default | `provider/model` used when a call gives none. |
-| `OPENCLAUDE_VARIANT` | none | Default reasoning variant, e.g. `high`. |
-| `OPENCLAUDE_AGENT` | opencode's default | Default agent. |
-| `OPENCLAUDE_DIRECTORY` | server's working directory | Project directory opencode works in. |
-| `OPENCLAUDE_AUTO_APPROVE` | `1` | Approve opencode's permission prompts automatically. Set `0` to reject them instead. |
-| `OPENCLAUDE_MAX_DIFF_CHARS` | `40000` | Diff length cap in the tool result. |
-| `OPENCLAUDE_MAX_REPORT_CHARS` | `24000` | Report length cap in the tool result. |
-| `OPENCLAUDE_STARTUP_TIMEOUT_MS` | `60000` | How long to wait for `opencode serve` to come up. |
+| `OPENCODE_MCP_MODEL` | opencode's default | `provider/model` used when a call gives none. |
+| `OPENCODE_MCP_VARIANT` | none | Default reasoning variant, e.g. `high`. |
+| `OPENCODE_MCP_AGENT` | opencode's default | Default agent. |
+| `OPENCODE_MCP_DIRECTORY` | server's working directory | Project directory opencode works in. |
+| `OPENCODE_MCP_AUTO_APPROVE` | `1` | Approve opencode's permission prompts automatically. Set `0` to reject them instead. |
+| `OPENCODE_MCP_MAX_DIFF_CHARS` | `40000` | Diff length cap in the tool result. |
+| `OPENCODE_MCP_MAX_REPORT_CHARS` | `24000` | Report length cap in the tool result. |
+| `OPENCODE_MCP_STARTUP_TIMEOUT_MS` | `60000` | How long to wait for `opencode serve` to come up. |
 | `OPENCODE_URL` | none | Attach to an already running `opencode serve` instead of spawning one. |
 | `OPENCODE_BIN` | `opencode` | Path to the opencode binary. |
 

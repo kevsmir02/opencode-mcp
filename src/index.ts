@@ -8,14 +8,14 @@ import { OpencodeClient, type AssistantMessage, type FileDiff, type Message, typ
 const env = {
   url: process.env.OPENCODE_URL,
   binary: process.env.OPENCODE_BIN ?? "opencode",
-  directory: path.resolve(process.env.OPENCLAUDE_DIRECTORY ?? process.cwd()),
-  defaultModel: process.env.OPENCLAUDE_MODEL,
-  defaultAgent: process.env.OPENCLAUDE_AGENT,
-  defaultVariant: process.env.OPENCLAUDE_VARIANT,
-  autoApprove: (process.env.OPENCLAUDE_AUTO_APPROVE ?? "1") !== "0",
-  maxDiffChars: Number(process.env.OPENCLAUDE_MAX_DIFF_CHARS ?? 40_000),
-  maxReportChars: Number(process.env.OPENCLAUDE_MAX_REPORT_CHARS ?? 24_000),
-  startupTimeoutMs: Number(process.env.OPENCLAUDE_STARTUP_TIMEOUT_MS ?? 60_000),
+  directory: path.resolve(process.env.OPENCODE_MCP_DIRECTORY ?? process.cwd()),
+  defaultModel: process.env.OPENCODE_MCP_MODEL,
+  defaultAgent: process.env.OPENCODE_MCP_AGENT,
+  defaultVariant: process.env.OPENCODE_MCP_VARIANT,
+  autoApprove: (process.env.OPENCODE_MCP_AUTO_APPROVE ?? "1") !== "0",
+  maxDiffChars: Number(process.env.OPENCODE_MCP_MAX_DIFF_CHARS ?? 40_000),
+  maxReportChars: Number(process.env.OPENCODE_MCP_MAX_REPORT_CHARS ?? 24_000),
+  startupTimeoutMs: Number(process.env.OPENCODE_MCP_STARTUP_TIMEOUT_MS ?? 60_000),
 };
 
 const log = (line: string) => process.stderr.write(line + "\n");
@@ -78,7 +78,7 @@ function formatDiffs(diffs: FileDiff[]): { summary: string; patch: string } {
   return { summary: `${diffs.length} file(s), +${additions}/-${deletions}\n${lines.join("\n")}`, patch };
 }
 
-const server = new McpServer({ name: "openclaude", version: "0.1.0" });
+const server = new McpServer({ name: "opencode-mcp", version: "0.1.0" });
 
 server.registerTool(
   "delegate",
@@ -95,7 +95,7 @@ server.registerTool(
     ].join("\n"),
     inputSchema: {
       task: z.string().min(1).describe("Full task description. Include goal, constraints, acceptance criteria, and ask for a final report."),
-      model: z.string().optional().describe('"provider/model", e.g. "opencode-go/deepseek-v4.1-flash". Defaults to OPENCLAUDE_MODEL or opencode\'s configured default.'),
+      model: z.string().optional().describe('"provider/model", e.g. "opencode-go/deepseek-v4.1-flash". Defaults to OPENCODE_MCP_MODEL or opencode\'s configured default.'),
       variant: z.string().optional().describe('Reasoning effort variant for the model, e.g. "low", "medium", "high", "max". Provider-specific.'),
       agent: z.string().optional().describe('opencode agent, e.g. "build" (edits allowed) or "plan" (read-only exploration). See list_agents.'),
       session_id: z.string().optional().describe("Continue an existing opencode session instead of starting a new one."),
@@ -339,7 +339,7 @@ server.registerTool(
     const client = await getClient();
     const text = [
       `url: ${client.baseUrl}`,
-      `managed: ${client.managed ? "spawned by openclaude" : "attached to existing server"}`,
+      `managed: ${client.managed ? "spawned by opencode-mcp" : "attached to existing server"}`,
       `directory: ${env.directory}`,
       `default model: ${env.defaultModel ?? "opencode default"}`,
       `auto-approve permissions: ${env.autoApprove}`,
@@ -363,6 +363,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  log(`openclaude failed: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
+  log(`opencode-mcp failed: ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
   process.exit(1);
 });

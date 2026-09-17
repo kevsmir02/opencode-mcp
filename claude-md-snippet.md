@@ -1,6 +1,6 @@
 ## Delegating to opencode
 
-The `openclaude` MCP server is available. You are the orchestrator: plan, review, decide. opencode does the heavy lifting.
+The `opencode` MCP server (opencode-mcp) is available. You are the orchestrator: plan, review, decide. opencode does the heavy lifting.
 
 - Delegate with the `delegate` tool for codebase exploration, implementation, debugging and test writing. Use `agent: "plan"` for read-only exploration and `agent: "build"` for changes.
 - Name the model and variant the user asked for. If they did not, use the configured default.

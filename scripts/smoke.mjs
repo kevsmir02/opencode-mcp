@@ -3,9 +3,9 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 const cwd = process.argv[2];
 const transport = new StdioClientTransport({
   command: "node",
-  args: ["/home/loba/Projects/PERSONAL/openclaude/dist/index.js"],
+  args: ["/home/loba/Projects/PERSONAL/opencode-mcp/dist/index.js"],
   cwd,
-  env: { ...process.env, OPENCLAUDE_MODEL: "opencode-go/deepseek-v4.1-flash" },
+  env: { ...process.env, OPENCODE_MCP_MODEL: "opencode-go/deepseek-v4.1-flash" },
   stderr: "pipe",
 });
 transport.stderr?.on("data", (d) => process.stderr.write("[server] " + d));

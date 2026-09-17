@@ -1,11 +1,11 @@
 {
-  "name": "openclaude",
+  "name": "opencode-mcp",
   "version": "0.1.0",
   "description": "MCP server that lets Claude Code delegate tasks to models served through opencode",
   "type": "module",
   "private": true,
   "bin": {
-    "openclaude": "dist/index.js"
+    "opencode-mcp": "dist/index.js"
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
