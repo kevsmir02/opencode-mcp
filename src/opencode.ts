@@ -266,6 +266,11 @@ export class OpencodeClient {
     return this.request<FileDiff[]>("GET", `/session/${encodeURIComponent(sessionID)}/diff`, { query: { directory, messageID } });
   }
 
+  /** Busy sessions keyed by id; idle sessions are absent. */
+  status(directory: string): Promise<Record<string, { type: string }>> {
+    return this.request<Record<string, { type: string }>>("GET", "/session/status", { query: { directory } });
+  }
+
   abort(directory: string, sessionID: string): Promise<boolean> {
     return this.request<boolean>("POST", `/session/${encodeURIComponent(sessionID)}/abort`, { query: { directory } });
   }

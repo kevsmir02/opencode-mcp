@@ -70,7 +70,9 @@ opencode attach http://127.0.0.1:<port>
 
 | Tool | Purpose |
 | --- | --- |
-| `delegate` | Run a task in an opencode session. Parameters: `task`, `model`, `variant`, `agent`, `session_id`, `directory`, `title`, `timeout_seconds`, `include_diff`. |
+| `delegate` | Start a task in an opencode session. Returns the report and diff if it finishes within `wait_seconds` (default 120), otherwise a running status with the `session_id`. Parameters: `task`, `model`, `variant`, `agent`, `session_id`, `directory`, `title`, `wait_seconds`, `timeout_seconds`, `include_diff`. |
+| `wait` | Collect a running task: waits up to `wait_seconds` and returns the report and diff, or another running status. Repeat as needed. |
+| `cancel` | Abort a running session. Work already on disk stays. |
 | `list_models` | Models opencode can use here, as `provider/model` strings, with reasoning variants. |
 | `list_agents` | opencode agents. `plan` is read-only exploration, `build` may edit. |
 | `server_info` | The opencode server URL and how to attach a TUI to it. |
@@ -92,7 +94,13 @@ All optional, set through the MCP server's `env`.
 | `OPENCODE_URL` | none | Attach to an already running `opencode serve` instead of spawning one. |
 | `OPENCODE_BIN` | `opencode` | Path to the opencode binary. |
 
-Claude Code's own MCP tool timeout applies to long delegations. Raise it with `MCP_TOOL_TIMEOUT` (milliseconds) in your Claude Code environment if a task legitimately runs longer than the default.
+## Long tasks
+
+No single tool call blocks for the whole task. `delegate` sends the prompt and waits at most `wait_seconds`; if opencode is still working it returns a running status and the task carries on inside the bridge process. Claude then calls `wait` as many times as it likes, each call bounded by its own `wait_seconds`, and gets the full report and diff once the turn ends. A dropped tool call therefore loses nothing: the session keeps running and the result stays cached for the next `wait`.
+
+`timeout_seconds` is the only hard limit. It aborts the opencode session outright (default 30 minutes) and is meant for runaway tasks, not for pacing.
+
+If the bridge process restarts, `wait` falls back to polling opencode's session status and rebuilds the result from the transcript, so a `session_id` stays collectable.
 
 ## Orchestration guidance for Claude
 
@@ -101,9 +109,9 @@ Copy `claude-md-snippet.md` into the `CLAUDE.md` of projects where you want Clau
 ## How it works
 
 1. On the first tool call the server spawns `opencode serve` on a free localhost port, or attaches to `OPENCODE_URL`.
-2. `delegate` creates a session with an allow-all permission rule, sends the task with the requested model, agent and variant, and blocks until opencode finishes.
-3. While waiting it streams opencode's events: tool calls become MCP progress notifications, permission prompts are auto-answered, and questions are rejected so opencode proceeds on its own judgment.
-4. It returns the final assistant text plus the session diff. Claude reviews that, runs the tests, and decides.
+2. `delegate` creates a session with an allow-all permission rule, sends the task with the requested model, agent and variant, and waits up to `wait_seconds` for it to finish.
+3. Meanwhile it streams opencode's events: tool calls become MCP progress notifications on whichever `delegate` or `wait` call is attached, permission prompts are auto-answered, and questions are rejected so opencode proceeds on its own judgment.
+4. When the turn ends it returns the final assistant text plus the session diff, either from that `delegate` call or from a later `wait`. Claude reviews that, runs the tests, and decides.
 
 ## Development
 
