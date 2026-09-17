@@ -238,7 +238,7 @@ export class OpencodeClient {
   }
 
   getSession(directory: string, sessionID: string): Promise<Session> {
-    return this.request<Session>("GET", `/session/${sessionID}`, { query: { directory } });
+    return this.request<Session>("GET", `/session/${encodeURIComponent(sessionID)}`, { query: { directory } });
   }
 
   /** Blocks until opencode finishes the turn; returns the assistant message it produced. */
@@ -254,20 +254,20 @@ export class OpencodeClient {
     },
     signal?: AbortSignal,
   ): Promise<PromptResponse> {
-    return this.request<PromptResponse>("POST", `/session/${sessionID}/message`, { query: { directory }, body, signal });
+    return this.request<PromptResponse>("POST", `/session/${encodeURIComponent(sessionID)}/message`, { query: { directory }, body, signal });
   }
 
   messages(directory: string, sessionID: string): Promise<Message[]> {
-    return this.request<Message[]>("GET", `/session/${sessionID}/message`, { query: { directory } });
+    return this.request<Message[]>("GET", `/session/${encodeURIComponent(sessionID)}/message`, { query: { directory } });
   }
 
   /** Without messageID opencode returns the session-wide diff, which is empty for headless sessions; pass the user message id. */
   diff(directory: string, sessionID: string, messageID?: string): Promise<FileDiff[]> {
-    return this.request<FileDiff[]>("GET", `/session/${sessionID}/diff`, { query: { directory, messageID } });
+    return this.request<FileDiff[]>("GET", `/session/${encodeURIComponent(sessionID)}/diff`, { query: { directory, messageID } });
   }
 
   abort(directory: string, sessionID: string): Promise<boolean> {
-    return this.request<boolean>("POST", `/session/${sessionID}/abort`, { query: { directory } });
+    return this.request<boolean>("POST", `/session/${encodeURIComponent(sessionID)}/abort`, { query: { directory } });
   }
 
   agents(directory: string): Promise<Agent[]> {
@@ -279,11 +279,11 @@ export class OpencodeClient {
   }
 
   replyPermission(directory: string, sessionID: string, permissionID: string, response: "once" | "always" | "reject"): Promise<boolean> {
-    return this.request<boolean>("POST", `/session/${sessionID}/permissions/${permissionID}`, { query: { directory }, body: { response } });
+    return this.request<boolean>("POST", `/session/${encodeURIComponent(sessionID)}/permissions/${encodeURIComponent(permissionID)}`, { query: { directory }, body: { response } });
   }
 
   rejectQuestion(directory: string, requestID: string): Promise<unknown> {
-    return this.request("POST", `/question/${requestID}/reject`, { query: { directory } });
+    return this.request("POST", `/question/${encodeURIComponent(requestID)}/reject`, { query: { directory } });
   }
 
   /** Streams server-sent events until `signal` aborts. Resolves (never rejects) when the stream ends. */

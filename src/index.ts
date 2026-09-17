@@ -116,6 +116,9 @@ server.registerTool(
     const includeDiff = args.include_diff ?? true;
 
     let sessionID = args.session_id;
+    if (sessionID && !/^ses[A-Za-z0-9_-]+$/.test(sessionID)) {
+      throw new Error(`session_id must be an opencode session id (starts with "ses"), got "${sessionID}"`);
+    }
     if (!sessionID) {
       const session = await client.createSession(directory, {
         title: args.title ?? args.task.slice(0, 80),
